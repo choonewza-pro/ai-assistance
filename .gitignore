@@ -113,5 +113,7 @@ dmypy.json
 # VS Code
 .vscode/
 
+# macOS
+.DS_Store
 
 ollama-server/ollama-models/
