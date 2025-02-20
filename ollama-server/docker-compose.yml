@@ -1,8 +1,37 @@
 services:
   ollama:
+    build: .
     container_name: ollama
     image: ollama/ollama
     volumes:
       - ./ollama-models:/root/.ollama
     ports:
       - 11434:11434
+    restart: always
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-network
+
+  jupyter:
+    image: jupyter/base-notebook
+    container_name: jupyter_notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    restart: unless-stopped
+    # network_mode: host
+    environment:
+      - JUPYTER_TOKEN=123456  # ตั้งค่า Token สำหรับการเข้าถึง
+    command: start-notebook.sh --NotebookApp.allow_origin='*' --NotebookApp.ip='0.0.0.0' --NotebookApp.port=8888 --NotebookApp.allow_remote_access=True
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    name: "ai-network"
+    driver: bridge
+    external: true
