@@ -1,5 +1,8 @@
-# Install
-pip install "fastapi[standard]"
+# Install FastAPI
+pip install fastapi uvicorn
+
+# Install AI Libraries
+pip install -U requests beautifulsoup4 langchain-community langchain-text-splitters langchain-chroma pypdf 
 
 # Run
-fastapi dev main.py
+uvicorn main:app --reload
