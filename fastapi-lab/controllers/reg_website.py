@@ -69,6 +69,8 @@ def reg_website():
             Answer: English are allowed.
     """
 
+    print(prompt)
+
     response = llm.invoke(prompt)
 
     return {
