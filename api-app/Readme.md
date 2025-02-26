@@ -1,3 +1,5 @@
+https://stackpython.co/tutorial/python-application-docker-container
+
 # CREATE
 ```
 $ mkdir todo-app
@@ -21,3 +23,7 @@ $ pip freeze > requirements.txt
 ```
 $ docker compose up -d
 ```
+
+
+
+pip install -U requests beautifulsoup4 langchain-community langchain-text-splitters langchain-chroma langchain_ollama pypdf
