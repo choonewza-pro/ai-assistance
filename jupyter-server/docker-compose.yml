@@ -1,6 +1,6 @@
 services:
   jupyter:
-    build: ./jupyter
+    build: .
     container_name: jupyter_notebook
     ports:
       - "8888:8888"
