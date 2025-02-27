@@ -1,6 +1,7 @@
 # นำเข้าโมดูลที่ต้องการ
-from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
 
 # วิธีใช้งาน
 # from src.utils.typhoon_2_assistant import Typhoon2Assistant
@@ -17,7 +18,7 @@ class Typhoon2Assistant:
     def ask(self, prompt: str):
         # เตรียมข้อความนำเข้า
         messages = [
-            {"role": "system", "content": "คุณคือผู้ช่วย AI ที่ให้คำตอบอย่างดี มีหน้าที่แปลไทยเป็นอังกฤษเท่านั้น"},
+            {"role": "system", "content": "You are a friendly assistant. Answer the question based only on the following context. If you don't know the answer, then reply, No Context available for this question."},
             {"role": "user", "content": prompt}
         ]
         # แปลงข้อความเป็น token (คืนค่าเป็น tensor โดยตรง)
@@ -44,5 +45,5 @@ class Typhoon2Assistant:
         # แปลงผลลัพธ์กลับเป็นข้อความ
         response = outputs[0][input_ids.shape[-1]:]
         answer = self.tokenizer.decode(response, skip_special_tokens=True)
-        print(answer)
+        return answer
 
