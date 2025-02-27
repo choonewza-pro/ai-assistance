@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Query
-from src.utils.ask_pdf import AskPDF
 from src.utils.typhoon_2_assistant import Typhoon2Assistant
 
 router = APIRouter()
