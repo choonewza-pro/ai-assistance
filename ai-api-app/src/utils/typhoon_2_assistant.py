@@ -9,7 +9,8 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 # assistant.ask("ใส่ข้อความที่ต้องการถามที่นี่")
 
 class Typhoon2Assistant:
-    def __init__(self):
+    def __init__(self,system_content="You are a friendly assistant. Answer the question based only on the following context. If you don't know the answer, then reply, No Context available for this question."):
+        self.system_content = system_content
         self.model_id = "scb10x/llama3.2-typhoon2-1b-instruct"
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.bfloat16)
@@ -18,7 +19,7 @@ class Typhoon2Assistant:
     def ask(self, prompt: str):
         # เตรียมข้อความนำเข้า
         messages = [
-            {"role": "system", "content": "You are a friendly assistant. Answer the question based only on the following context. If you don't know the answer, then reply, No Context available for this question."},
+            {"role": "system", "content": self.system_content},
             {"role": "user", "content": prompt}
         ]
         # แปลงข้อความเป็น token (คืนค่าเป็น tensor โดยตรง)
