@@ -10,11 +10,6 @@ def ask_typhoon(
     llm = Typhoon2Assistant(system_content="คุณเป็นผู้ช่วยที่เป็นมิตร ตอบคำถามได้เป็นอย่างดี")
     answer = llm.ask(prompt)
     return {
-        "success": True,
-        "result":{
-            "answer": answer,
-        },
-        "input":{
-            "prompt": prompt,
-        }
+        "answer": answer,
+        "prompt": prompt,
     }
