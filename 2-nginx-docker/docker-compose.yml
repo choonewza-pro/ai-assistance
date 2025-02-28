@@ -7,7 +7,8 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./ssl:/user/src/app/ssl
     ports:
-      - 8181:8181
+      - 80:80
+      - 443:443
     networks:
       - ai-network
     deploy:
