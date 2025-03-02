@@ -1,0 +1,8 @@
+# Ignore environment files
+.env
+env/
+
+# Ignore Docker-related files and directories
+docker-compose.yml
+Dockerfile
+

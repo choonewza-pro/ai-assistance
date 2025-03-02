@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  ai-api-app:
+    build: .
+    image: "ai-api-app"
+    container_name: ai-api-app
+    command:
+      ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
+    volumes:
+      - .:/code
+    ports:
+      - "80:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    name: "ai-network"
+    driver: bridge
+    external: true

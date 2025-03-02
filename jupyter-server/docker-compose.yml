@@ -1,0 +1,21 @@
+services:
+  jupyter:
+    build: .
+    container_name: jupyter_notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    restart: unless-stopped
+    environment:
+      - JUPYTER_TOKEN=123456  # ตั้งค่า Token สำหรับการเข้าถึง
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-network
+
+networks:
+  ai-network:
+    name: "ai-network"
+    driver: bridge
+    external: true

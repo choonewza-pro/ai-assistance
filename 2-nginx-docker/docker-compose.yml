@@ -1,0 +1,24 @@
+services:
+  ai-reverse-proxy:
+    image: nginx:latest
+    container_name: ai-reverse-proxy
+    restart: always
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ssl:/user/src/app/ssl
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - ai-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 1g
+
+networks:
+  ai-network:
+    name: "ai-network"
+    driver: bridge
+    external: true
