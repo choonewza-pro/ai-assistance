@@ -1,6 +1,6 @@
 # นำเข้าโมดูลที่ต้องการ
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM 
 
 
 # วิธีใช้งาน
