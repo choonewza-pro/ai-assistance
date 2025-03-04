@@ -7,25 +7,23 @@ services:
       - ./ollama-models:/root/.ollama
     ports:
       - 11434:11434
-    restart: always
+    restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
       - ai-network
-
-
-  jupyter:
-    build: ./jupyter
-    container_name: jupyter_notebook
-    ports:
-      - "8888:8888"
-    volumes:
-      - ./notebooks:/home/jovyan/work
+  
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
     restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - open-webui-data:/app/data
     environment:
-      - JUPYTER_TOKEN=123456  # ตั้งค่า Token สำหรับการเข้าถึง
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - OLLAMA_BASE_URL=http://ollama:11434  # เชื่อมต่อ Ollama ผ่านชื่อ container
+      - PORT=3000
     networks:
       - ai-network
 
@@ -34,3 +32,6 @@ networks:
     name: "ai-network"
     driver: bridge
     external: true
+
+volumes:
+  open-webui-data:
