@@ -12,7 +12,18 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - ai-network
-  
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all  # ใช้ GPU ทั้งหมดที่มี
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - OLLAMA_USE_CUDA=1  # บอก Ollama ให้ใช้ CUDA
+
   open-webui:
     image: ghcr.io/open-webui/open-webui:latest
     container_name: open-webui
@@ -26,21 +37,6 @@ services:
       - PORT=3000
     networks:
       - ai-network
-  
-  n8n:
-    image: n8nio/n8n
-    container_name: n8n
-    restart: unless-stopped
-    ports:
-      - "5678:5678"
-    environment:
-      - N8N_HOST=n8n
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-    volumes:
-      - n8n-data:/home/node/.n8n
-    networks:
-      - ai-network
 
 networks:
   ai-network:
@@ -50,4 +46,3 @@ networks:
 
 volumes:
   open-webui-data:
-  n8n-data:
