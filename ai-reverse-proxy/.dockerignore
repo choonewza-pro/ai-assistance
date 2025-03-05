@@ -1,0 +1,39 @@
+# Node/Bun dependencies
+node_modules
+.npm
+.yarn
+*.log
+
+# Build outputs
+dist
+build
+.output
+
+# Development files
+.git
+.github
+.gitignore
+.vscode
+.idea
+*.md
+!README.md
+
+# Testing
+coverage
+.nyc_output
+test
+tests
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS specific
+.DS_Store
+Thumbs.db
