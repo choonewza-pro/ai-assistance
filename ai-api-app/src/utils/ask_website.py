@@ -13,17 +13,17 @@ class AskWebsite:
         self.ingest();
              
     def ingest(self):
-        documents = self.regUtils.loadContentFromWebsite(
+        documents = self.regUtils.loadDocumentsFromWebsite(
             url=self.url,
             targetClassName=self.targetClassName
         )
-        chunks = self.regUtils.documentsSplitter(
+        split_docs = self.regUtils.splitDocuments(
             documents=documents, 
             chunk_size=512, 
             chunk_overlap=51
         )
         self.regUtils.ingest(
-            chunks=chunks,
+            split_docs=split_docs,
         )
         vectorstore = self.regUtils.loadVectorStore()
         retriever = self.regUtils.getRetriever(vectorstore)

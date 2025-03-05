@@ -15,13 +15,13 @@ class AskPDF:
         documents = self.regUtils.loadContentFromPDF(
             pdf_path=self.pdf_path,
         )
-        chunks = self.regUtils.documentsSplitter(
+        split_docs = self.regUtils.splitDocuments(
             documents=documents, 
             chunk_size=512, 
             chunk_overlap=51
         )
         self.regUtils.ingest(
-            chunks=chunks,
+            split_docs=split_docs,
         )
         vectorstore = self.regUtils.loadVectorStore()
         retriever = self.regUtils.getRetriever(vectorstore)

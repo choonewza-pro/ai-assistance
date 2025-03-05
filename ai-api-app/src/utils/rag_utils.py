@@ -2,7 +2,6 @@ import os
 import bs4
 import requests
 import shutil 
-import time
 from typing import List
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -11,6 +10,7 @@ from langchain_community.document_loaders import WebBaseLoader
 from langchain_core.retrievers import BaseRetriever
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.document_loaders import PyPDFLoader
+from pypdf import PdfReader
 
 class RagUtils:
     def __init__(self,embeddings_dir: str):
@@ -29,8 +29,8 @@ class RagUtils:
         headers = kwargs.pop("headers", {})
         headers["User-Agent"] = user_agent
         return self.original_get(url, headers=headers, *args, **kwargs)
-
-    def textSplitter(self, text: str, chunk_size: int, chunk_overlap: int, metadataSource: str):
+    
+    def splitText(self, text: str, chunk_size: int, chunk_overlap: int, metadataSource: str):
         """
         Split the input text into smaller chunks using RecursiveCharacterTextSplitter.
         """
@@ -45,7 +45,8 @@ class RagUtils:
         print(f"Split text into {len(chunks)} chunks.")
         return chunks
 
-    def documentsSplitter(self, documents: Document, chunk_size: int, chunk_overlap: int):
+    #splitDocuments
+    def splitDocuments(self, documents: Document, chunk_size: int, chunk_overlap: int):
         """
         Split the input documents into smaller chunks using RecursiveCharacterTextSplitter.
         """
@@ -59,7 +60,7 @@ class RagUtils:
         print(f"Split text into {len(chunks)} chunks.")
         return chunks
 
-    def ingest(self, chunks: List[Document]):
+    def ingest(self, split_docs: List[Document]):
         """
         Ingest the list of Document chunks into a vector database.
         """
@@ -73,11 +74,14 @@ class RagUtils:
         if os.path.exists(os.path.join(self.embeddings_dir, "chroma.sqlite3")):
             print("-- use Append data to vector store--")
             vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=embedding)
-            vector_store.add_documents(documents=chunks)
+            # ลบ documents ทั้งหมดก่อน
+            vector_store.reset_collection()  # Ensure the collection is initialized
+            # สร้าง collection ใหม่โดยอัตโนมัติเมื่อเพิ่ม documents
+            vector_store.add_documents(documents=split_docs)
         else:
             print("-- use New vector store--")
             os.makedirs(self.embeddings_dir, exist_ok=True)
-            vector_store = Chroma.from_documents(documents=chunks, embedding=embedding, persist_directory=self.embeddings_dir)
+            vector_store = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=self.embeddings_dir)
 
         print("-- Ingest to Vector Database Success ---")
         return vector_store
@@ -92,19 +96,7 @@ class RagUtils:
         else:
             print(f"Vector database at {self.embeddings_dir} does not exist.")
 
-    def loadContentFromWebsite(self, url: str, targetClassName: str):
-        """
-        Load content from a website using the specified target class name.
-        """
-        requests.get = self.patched_get
-        bs4_strainer = bs4.SoupStrainer(class_=targetClassName)
-        loader = WebBaseLoader(
-            web_paths=(url,),
-            bs_kwargs={"parse_only": bs4_strainer},
-        )
-        docs = loader.load()
-        requests.get = self.original_get
-        return docs
+    
 
     def loadVectorStore(self):
         """
@@ -172,10 +164,56 @@ class RagUtils:
             """
         return prompt
     
-    def loadContentFromPDF(self, pdf_path: str):
+    def loadDocumentsFromWebsite(self, url: str, targetClassName: str):
         """
-        Load content from a PDF file.
+        Load content from a website using the specified target class name.
         """
-        loader = PyPDFLoader(pdf_path)
-        docs = loader.load_and_split()
+        requests.get = self.patched_get
+        bs4_strainer = bs4.SoupStrainer(class_=targetClassName)
+        loader = WebBaseLoader(
+            web_paths=(url,),
+            bs_kwargs={"parse_only": bs4_strainer},
+        )
+        docs = loader.load()
+        requests.get = self.original_get
         return docs
+    
+    def listPdfFiles(self, directory: str):
+        """
+        List all PDF files in the specified directory.
+        """
+        pdf_files = [f for f in os.listdir(directory) if f.endswith('.pdf')]
+        pdf_details = []
+        
+        for pdf_file in pdf_files:
+            file_path = os.path.join(directory, pdf_file)
+            file_size = os.path.getsize(file_path)
+            
+            with open(file_path, "rb") as f:
+                pdf_reader = PdfReader(f)
+                num_pages = len(pdf_reader.pages)
+            
+            file_info = {
+                "file_name": pdf_file,
+                "num_pages": num_pages,
+                "file_size": file_size
+            }
+            
+            pdf_details.append(file_info)
+        return pdf_files, pdf_details
+    
+    def loadDocumentsFromPdfFiles(self, directory:str):
+        documents = []
+        # Loop ผ่านไฟล์ทั้งหมดใน directory
+        for filename in os.listdir(directory):
+            if filename.endswith('.pdf'):
+                file_path = os.path.join(directory, filename)
+                try:
+                    # โหลด PDF โดยใช้ PyPDFLoader
+                    loader = PyPDFLoader(file_path)
+                    docs = loader.load()
+                    documents.extend(docs)
+                    print(f"Loaded: {filename}")
+                except Exception as e:
+                    print(f"Error loading {filename}: {str(e)}")
+        return documents
