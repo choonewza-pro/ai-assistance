@@ -1,7 +1,7 @@
 import time
 import os
 from fastapi import APIRouter, Query
-from src.utils.rag_utils import RagUtils
+from src.utils.ask_pdfs import AskPDFs
 
 router = APIRouter()
 
@@ -11,23 +11,14 @@ def rag_pdf_search(
 ):
     start_time = time.time()
 
-    ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
-    vector_store = ragUtils.loadVectorStore();
-    vector_store_details = {
-        "embedding_model": ragUtils.model_name,
-    }
-
-    retriever = ragUtils.getRetriever(vector_store=vector_store)
-    retrieved_docs = retriever.invoke(question)
-    
-    # Convert retrieved_docs to a JSON-serializable format
-    retrieved_docs_json = [{"content": doc.page_content, "metadata": doc.metadata} for doc in retrieved_docs]
+    askPDFs = AskPDFs()
+    result = askPDFs.search_pdf_chunks(question=question);
     
     end_time = time.time()
     execution_time = end_time - start_time
 
     return {
-        "execution_time": execution_time,
-        "retrieved_docs": retrieved_docs_json,
-        "vector_store_details": vector_store_details,
+        "execution_time1": execution_time,
+        "vector_store_details": result["vector_store_details"],
+        "retrieved_docs": result["retrieved_docs"],
     }

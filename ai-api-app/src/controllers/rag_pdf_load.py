@@ -2,6 +2,7 @@ import time
 import os
 from fastapi import APIRouter
 from src.utils.rag_utils import RagUtils
+from src.utils.ask_pdfs import AskPDFs
 
 router = APIRouter()
 
@@ -9,29 +10,20 @@ router = APIRouter()
 def rag_pdf_load():
     start_time = time.time()
 
-    ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
+    askPDFs = AskPDFs()
+
     current_dir = os.getcwd()
     pdf_directory = current_dir + "/public/pdf_files"
 
-    pdf_files, pdf_details = ragUtils.listPdfFiles(directory=pdf_directory)
-
-    documents = ragUtils.loadDocumentsFromPdfFiles(directory=pdf_directory)
-    split_docs = ragUtils.splitDocuments(documents=documents, chunk_size=512, chunk_overlap=54)
-
-    # Ensure the collection is initialized
-    ragUtils.ingest(split_docs=split_docs)
-
-    vector_store_details = {
-        "embedding_model": ragUtils.model_name,
-    }
+    result = askPDFs.load_pdfs(pdf_directory=pdf_directory)
 
     end_time = time.time()
     execution_time = end_time - start_time
 
     return {
         "execution_time": execution_time,
-        "vector_store_details": vector_store_details,
-        "Total chunks created:": len(split_docs),
-        "pdf_files": pdf_files,
-        "pdf_details": pdf_details,
+        "vector_store_details": result["vector_store_details"],
+        "chunks_created": result["chunks_created"],
+        "pdf_files": result["pdf_files"],
+        "pdf_details": result["pdf_details"],
     }

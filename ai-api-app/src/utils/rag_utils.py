@@ -74,8 +74,8 @@ class RagUtils:
         if os.path.exists(os.path.join(self.embeddings_dir, "chroma.sqlite3")):
             print("-- use Append data to vector store--")
             vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=embedding)
-            # ลบ documents ทั้งหมดก่อน
-            vector_store.reset_collection()  # Ensure the collection is initialized
+            # # ลบ documents ทั้งหมดก่อน
+            # vector_store.reset_collection()  # Ensure the collection is initialized
             # สร้าง collection ใหม่โดยอัตโนมัติเมื่อเพิ่ม documents
             vector_store.add_documents(documents=split_docs)
         else:
@@ -102,15 +102,18 @@ class RagUtils:
         """
         Load the vector store from the specified embeddings directory.
         """
-        
-        embedding = HuggingFaceEmbeddings(
-            model_name=self.model_name,
-            model_kwargs=self.model_kwargs,
-            encode_kwargs=self.encode_kwargs
-        )
-        vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=embedding)
-        print("-- Vector Store Loaded --")
-        return vector_store
+        if os.path.exists(os.path.join(self.embeddings_dir, "chroma.sqlite3")):
+            embedding = HuggingFaceEmbeddings(
+                model_name=self.model_name,
+                model_kwargs=self.model_kwargs,
+                encode_kwargs=self.encode_kwargs
+            )
+            vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=embedding)
+            print(f"Vector store loaded from {self.embeddings_dir}.")
+            return vector_store
+        else:
+            print(f"Vector store at {self.embeddings_dir} does not exist.")
+            return None
 
     def deleteDocumentByIds(self, document_ids: List[str]):
         """
@@ -141,6 +144,21 @@ class RagUtils:
             print("All documents deleted successfully.")
         else:
             print(f"Vector store at {self.embeddings_dir} does not exist.")
+    
+    def resetAllDocuments(self):
+        """
+        ลบเอกสารทั้งหมดใน Chroma vector store
+        """
+        if os.path.exists(os.path.join(self.embeddings_dir, "chroma.sqlite3")):
+            vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=HuggingFaceEmbeddings(
+                model_name=self.model_name,
+                model_kwargs=self.model_kwargs,
+                encode_kwargs=self.encode_kwargs
+            ))
+            vector_store.reset_collection()
+            print("All documents reset successfully.")
+        else:
+            print(f"Vector store at {self.embeddings_dir} does not exist.")
 
     def getRetriever(self, vector_store: Chroma):
         """
@@ -149,18 +167,17 @@ class RagUtils:
         retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
         return retriever
 
-    def genPrompt(self, question: str, retriever: BaseRetriever):
+    def genPrompt(self, question: str, retriever: BaseRetriever, role: str = "คุณเป็นผู้ช่วยตอบคำถามแบบสุภาพ"):
         """
         Generate a prompt based on the retrieved documents for the given question.
         """
         retrieved_docs = retriever.invoke(question)
         context = ' '.join([doc.page_content for doc in retrieved_docs])
         prompt = f"""
-            [Instructions] 
-                Question: {question}
-                Context: {context} 
-                Answer:
-            [/Instructions]
+                {role} 
+                คำถาม: {question}
+                บริบท: {context} 
+                กรุณาตอบคำถามโดยสรุปข้อมูลที่เกี่ยวข้อง
             """
         return prompt
     
