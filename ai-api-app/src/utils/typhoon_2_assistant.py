@@ -9,9 +9,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 # assistant.ask("ใส่ข้อความที่ต้องการถามที่นี่")
 
 class Typhoon2Assistant:
-    def __init__(self,system_content="You are a friendly assistant. Answer the question based only on the following context. If you don't know the answer, then reply, No Context available for this question."):
+    def __init__(self,
+                 system_content="You are a friendly assistant. Answer the question based only on the following context. If you don't know the answer, then reply, No Context available for this question.",
+                 model_id="scb10x/llama3.2-typhoon2-1b-instruct",
+                 ):
         self.system_content = system_content
-        self.model_id = "scb10x/llama3.2-typhoon2-1b-instruct"
+        self.model_id = model_id
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_id)
         self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.bfloat16)
         # self.model = AutoModelForCausalLM.from_pretrained(self.model_id, torch_dtype=torch.bfloat16, device_map="auto")
