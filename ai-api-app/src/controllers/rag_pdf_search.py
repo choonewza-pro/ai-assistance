@@ -1,15 +1,15 @@
 import time
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from src.utils.rag_utils import RagUtils
 
 router = APIRouter()
 
 @router.get("/rag-pdf-search")
-def rag_pdf_load():
+def rag_pdf_search(
+    question: str = Query(..., description="The URL of the website to query"),
+):
     start_time = time.time()
-
-    question = "หลักสูตรผู้บริการ"
 
     ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
     vector_store = ragUtils.loadVectorStore();
