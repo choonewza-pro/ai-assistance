@@ -27,5 +27,6 @@ def ask_typhoon_summary(request: QuestionRequest):
     return {
         "answer": answer,
         "prompt": request.prompt,
-        "execution_time": execution_time
+        "execution_time": execution_time,
+        "model": model_id
     }

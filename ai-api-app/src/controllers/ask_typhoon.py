@@ -24,5 +24,6 @@ def ask_typhoon(
     return {
         "answer": answer,
         "prompt": prompt,
-        "execution_time": execution_time
+        "execution_time": execution_time,
+        "model": model_id
     }
