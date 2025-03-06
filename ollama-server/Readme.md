@@ -13,7 +13,7 @@
 - docker compose exec -d ollama ollama run qwen2.5:3b
 
 # typhoon2 with Ollama
-- docker compose exec -d ollama ollama run hf.co/Float16-cloud/llama3.2-typhoon2-3b-instruct-gguf:IQ4_NL
+- docker compose exec -d ollama ollama pull hf.co/Float16-cloud/llama3.2-typhoon2-3b-instruct-gguf:IQ4_NL
 
 
 # Other Commands
