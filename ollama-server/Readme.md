@@ -14,6 +14,7 @@
 
 # typhoon2 with Ollama
 - docker compose exec -d ollama ollama pull hf.co/Float16-cloud/llama3.2-typhoon2-3b-instruct-gguf:IQ4_NL
+- docker compose exec -d ollama ollama pull hf.co/Float16-cloud/llama3.2-typhoon2-1b-instruct-gguf:IQ4_NL
 
 
 # Other Commands
