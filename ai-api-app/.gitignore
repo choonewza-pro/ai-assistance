@@ -30,4 +30,4 @@ archive.zip
 .DS_Store
 
 /chroma-*/*
-/public/pdf_files
+/public/pdf_files/*
