@@ -27,4 +27,6 @@ def rag_pdf_list_pdfs(
         "execution_time": execution_time,
         "pdf_files": result["pdf_files"],
         "pdf_details": result["pdf_details"],
+        "pdf_directory": pdf_directory,
+        "exist_pdf_directory": os.path.exists(pdf_directory),
     }

@@ -409,16 +409,14 @@ const ChatLLM = () => {
           </div>
           <div className="text-black">
             <div className="flex items-center justify-between gap-2 pb-2">
-              <div>PDFs</div>
-              {listFiles.pdf_details.length > 0 && (
-                <button
-                  className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
-                  onClick={handleReset}
-                  title="Reset PDF database"
-                >
-                  <TrashIcon className="w-4 h-4" />
-                </button>
-              )}
+              <div>Knowledge</div>
+              <button
+                className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
+                onClick={handleReset}
+                title="Reset PDF database"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
             </div>
             <div className="grid grid-cols-1 gap-2">
               {loading && (
@@ -432,7 +430,11 @@ const ChatLLM = () => {
                 </div>
               )}
               {listFiles.pdf_details.map((file) => (
-                <a href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`} target="_blank" key={file.file_name}>
+                <a
+                  href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`}
+                  target="_blank"
+                  key={file.file_name}
+                >
                   <div
                     key={file.file_name}
                     className="border border-gray-200 rounded-md p-2 bg-white shadow"
