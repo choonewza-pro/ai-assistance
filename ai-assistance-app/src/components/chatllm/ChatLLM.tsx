@@ -296,14 +296,14 @@ const ChatLLM = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {showLeftColumn && (
-        <div className="hidden sm:block w-1/4 bg-gray-200 p-4">
+        <div className="hidden sm:block w-1/4 bg-gray-200 p-4 text-black">
           <button
             className="mb-4 p-2 bg-gray-500 text-white rounded-lg"
             onClick={() => setShowLeftColumn(false)}
           >
             <ChevronLeftIcon className="w-6 h-6" />
           </button>
-          <div>Left Column Content</div>
+          <div>Chat with HRD AI ASSISTANCE</div>
         </div>
       )}
       <div className="flex-grow flex flex-col">
@@ -410,13 +410,15 @@ const ChatLLM = () => {
           <div className="text-black">
             <div className="flex items-center justify-between gap-2 pb-2">
               <div>Knowledge</div>
-              <button
-                className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
-                onClick={handleReset}
-                title="Reset PDF database"
-              >
-                <TrashIcon className="w-4 h-4" />
-              </button>
+              {listFiles.pdf_details.length > 0 && (
+                <button
+                  className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
+                  onClick={handleReset}
+                  title="Reset PDF database"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-2">
               {loading && (
@@ -430,11 +432,7 @@ const ChatLLM = () => {
                 </div>
               )}
               {listFiles.pdf_details.map((file) => (
-                <a
-                  href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`}
-                  target="_blank"
-                  key={file.file_name}
-                >
+                <a href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`} target="_blank" key={file.file_name}>
                   <div
                     key={file.file_name}
                     className="border border-gray-200 rounded-md p-2 bg-white shadow"
