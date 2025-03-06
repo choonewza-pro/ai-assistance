@@ -19,8 +19,7 @@ async def rag_pdf_upload_pdf(file: UploadFile = File(...)):
     file_path = os.path.join(pdf_directory, file.filename)
     with open(file_path, "wb") as f:
         f.write(await file.read())
-    
-    
+
     result = askPDFs.import_pdf(file_path=file_path)
 
     end_time = time.time()

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import appConfig from "@/common/config";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-const url = "http://localhost/rag-pdf-upload-pdf";
+const url = `${appConfig.apiBaseUrl}/rag-pdf-upload-pdf`;
 
 export async function POST(request: NextRequest) {
   try {

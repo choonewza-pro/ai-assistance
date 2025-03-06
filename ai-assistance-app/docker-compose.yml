@@ -1,0 +1,30 @@
+services:
+  ai-assistance-app:
+    container_name: ai-assistance-app
+    image: ai-assistance-app:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXTAUTH_URL=https://km4u.ntplc.co.th
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - TZ=Asia/Bangkok
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - ai-network
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 1g
+
+networks:
+  ai-network:
+    name: "ai-network"
+    driver: bridge
+    external: true

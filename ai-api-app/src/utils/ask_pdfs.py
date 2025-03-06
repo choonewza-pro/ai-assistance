@@ -1,5 +1,5 @@
 from src.utils.rag_utils import RagUtils
-
+# import pdfplumber
 class AskPDFs:
     def __init__(self):
         self.ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
@@ -15,6 +15,15 @@ class AskPDFs:
 
     def import_pdf(self, file_path:str):
         documents = self.ragUtils.loadDocumentFromPdfFile(file_path=file_path)
+
+        # # ใช้ pdfplumber แทนที่ข้อความ
+        # with pdfplumber.open(file_path) as pdf:
+        #     for i, page in enumerate(pdf.pages):
+        #         text = page.extract_text()
+        #         if text and i < len(documents):  # ตรวจสอบว่ามีข้อความและหน้าตรงกัน
+        #             documents[i].page_content = text  # แทนที่ข้อความจาก PyPDFLoader
+
+
         split_docs = self.ragUtils.splitDocuments(documents=documents, chunk_size=512, chunk_overlap=54)
         self.ragUtils.ingest(split_docs=split_docs)
         vector_store_details = {

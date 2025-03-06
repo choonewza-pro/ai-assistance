@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import appConfig from '@/common/config';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
-const resetUrl = 'http://localhost/rag-pdf-reset';
+const resetUrl = `${appConfig.apiBaseUrl}/rag-pdf-reset`;
 
 export async function POST() {
   try {

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import appConfig from '@/common/config';
 import axios from 'axios';
 
-const url = `http://localhost/rag-pdf-list-pdfs`
+const url = `${appConfig.apiBaseUrl}/rag-pdf-list-pdfs`
 
 export async function GET() {
   try {
@@ -14,7 +16,7 @@ export async function GET() {
       },
       status: 200,
     });
-  } catch (error) {
+  } catch (error:any) {
     console.error('Error fetching PDF data:', error);
     
     // Return appropriate error response

@@ -15,6 +15,8 @@ import { v4 as uuidv4 } from "uuid";
 import clsx from "clsx";
 import DOMPurify from "dompurify";
 import useListFiles from "./hooks/useListFiles";
+import DialogModal from "../modal/DialogModal";
+import appConfig from "@/common/config";
 
 type ChatMessage = {
   id: string;
@@ -29,6 +31,7 @@ const ChatLLM = () => {
   const [showRightColumn, setShowRightColumn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showModal1, setShowModal1] = useState(false);
 
   const { data: listFiles, error, loading, loadData } = useListFiles();
 
@@ -295,7 +298,7 @@ const ChatLLM = () => {
       {showLeftColumn && (
         <div className="hidden sm:block w-1/4 bg-gray-200 p-4">
           <button
-            className="mb-4 p-2 bg-blue-500 text-white rounded-lg"
+            className="mb-4 p-2 bg-gray-500 text-white rounded-lg"
             onClick={() => setShowLeftColumn(false)}
           >
             <ChevronLeftIcon className="w-6 h-6" />
@@ -308,7 +311,7 @@ const ChatLLM = () => {
           <div>
             {!showLeftColumn && (
               <button
-                className="p-2 bg-blue-500 text-white rounded-lg"
+                className="p-2 bg-gray-500 text-white rounded-lg"
                 onClick={() => setShowLeftColumn(!showLeftColumn)}
               >
                 <Bars3Icon className="w-6 h-6" />
@@ -318,14 +321,14 @@ const ChatLLM = () => {
 
           <div>
             <h1 className="text-xl font-bold text-blue-500">
-              อยากอบรมหลักสูตรอะไรถามมาครับ?
+              มีอะไรให้ช่วยบ้างครับ?
             </h1>
           </div>
 
           <div>
             {!showRightColumn && (
               <button
-                className="p-2 bg-blue-500 text-white rounded-lg"
+                className="p-2 bg-gray-500 text-white rounded-lg"
                 onClick={() => setShowRightColumn(!showRightColumn)}
               >
                 <Bars3Icon className="w-6 h-6" />
@@ -346,7 +349,8 @@ const ChatLLM = () => {
                 className={clsx("p-2 rounded-lg w-fit-content", {
                   "bg-blue-200 text-blue-900": message.role === "user",
                   "bg-gray-300 text-black": message.role === "prompt",
-                  "bg-green-200 text-green-900": message.role === "answer-status",
+                  "bg-green-200 text-green-900":
+                    message.role === "answer-status",
                   "bg-purple-200 text-purple-900": message.role === "answer",
                 })}
               >
@@ -397,7 +401,7 @@ const ChatLLM = () => {
         <div className="hidden sm:block w-1/4 bg-gray-200 p-4">
           <div className="flex justify-end">
             <button
-              className="mb-4 p-2 bg-blue-500 text-white rounded-lg"
+              className="mb-4 p-2 bg-gray-500 text-white rounded-lg"
               onClick={() => setShowRightColumn(false)}
             >
               <ChevronRightIcon className="w-6 h-6" />
@@ -428,25 +432,35 @@ const ChatLLM = () => {
                 </div>
               )}
               {listFiles.pdf_details.map((file) => (
-                <div
-                  key={file.file_name}
-                  className="border border-gray-200 rounded-md p-2 bg-white shadow"
-                >
-                  <div className="text-sm">{file.file_name}</div>
-                  <div className="flex gap-2">
-                    <div className="text-gray-500 text-sm">
-                      {(file.file_size / (1024 * 1024)).toFixed(2)} MB
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                      {file.num_pages} pages
+                <a href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`} target="_blank" key={file.file_name}>
+                  <div
+                    key={file.file_name}
+                    className="border border-gray-200 rounded-md p-2 bg-white shadow"
+                  >
+                    <div className="text-sm">{file.file_name}</div>
+                    <div className="flex gap-2">
+                      <div className="text-gray-500 text-sm">
+                        {(file.file_size / (1024 * 1024)).toFixed(2)} MB
+                      </div>
+                      <div className="text-gray-500 text-sm">
+                        {file.num_pages} pages
+                      </div>
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
         </div>
       )}
+
+      <DialogModal
+        isOpen={showModal1}
+        onClose={() => setShowModal1(false)}
+        title="Dialog Title"
+      >
+        Dialog Content
+      </DialogModal>
     </div>
   );
 };

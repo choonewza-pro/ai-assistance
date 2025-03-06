@@ -13,14 +13,38 @@ def rag_pdf_prompt(
 
     askPDFs = AskPDFs()
     result = askPDFs.genPrompt(question=question);
-    
+
+    def fix_thai_text(text):
+        # แผนที่สำหรับแทนที่ตัวอักษรที่เสียหาย
+        replacements = {
+            "": "่",  # วรรณยุกต์ไม้เอก
+            "": "้",  # วรรณยุกต์ไม้โท
+            "": "้",  # วรรณยุกต์ไม้โท (บางกรณีอาจซ้ำ)
+            "": "์",  # วรรณยุกต์การันต์
+            "": "็",  # วรรณยุกต์ไม้ตรี
+            "":"็", # วรรณยุกต์ไตคู้
+            "": "๋",  # วรรณยุกต์ไม้จัดตาวา
+            "ํ": "ำ",  # สระอำ
+            # เพิ่มตามตัวอักษรที่เสียหายในข้อมูลของคุณ
+        }
+        for wrong, correct in replacements.items():
+            text = text.replace(wrong, correct)
+        return text
+
+    prompt_fix = fix_thai_text(result["prompt"])
+
     end_time = time.time()
     execution_time = end_time - start_time
 
-    return {
+    response = {
         "execution_time": execution_time,
-        "prompt": result["prompt"],
+        "prompt": prompt_fix,
         "question": question,
         "retrieved_docs": result["retrieved_docs"],
         "vector_store_details": result["vector_store_details"],
     }
+    
+    
+
+    
+    return response

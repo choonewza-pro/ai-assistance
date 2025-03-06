@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import appConfig from '@/common/config';
 import axios from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
 
-const url = `http://localhost/rag-pdf-prompt`
+const url = `${appConfig.apiBaseUrl}/rag-pdf-prompt`
 
 export async function GET(request: NextRequest) {
   try {
