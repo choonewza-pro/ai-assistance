@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { NextRequest, NextResponse } from 'next/server';
 
+const url = `http://localhost/rag-pdf-prompt`
+
 export async function GET(request: NextRequest) {
   try {
     // Extract the question from the URL search params
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Construct the external API URL with the question parameter
-    const apiUrl = `http://localhost/rag-pdf-prompt?question=${encodeURIComponent(question)}`;
+    const apiUrl = `${url}?question=${encodeURIComponent(question)}`;
     
     // Call the external API
     const response = await axios.get(apiUrl);

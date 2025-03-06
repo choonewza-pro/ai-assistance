@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = 'http://localhost/rag-pdf-list-pdfs'
+const url = `http://localhost/rag-pdf-list-pdfs`
 
 export async function GET() {
   try {

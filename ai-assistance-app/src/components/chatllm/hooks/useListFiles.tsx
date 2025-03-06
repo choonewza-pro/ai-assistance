@@ -11,22 +11,30 @@ const useListFiles = () => {
     pdf_details: [],
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string|null>(null);
+
   const loadData = async () => {
+    setLoading(true);
+    setError(null);
     const [error, result] = await to(
       axios.get("/api/rag-pdf-list-pdfs").then((res) => res.data)
     );
     if (error) {
+      setLoading(false);
+      setError(error.message);
       console.log("error", error);
       return;
     }
     setData(result);
+    setLoading(false);
   };
 
   useEffect(() => {
     loadData();
   }, []);
 
-  return { data, loadData };
+  return { data,error,loading, loadData };
 };
 
 export default useListFiles;

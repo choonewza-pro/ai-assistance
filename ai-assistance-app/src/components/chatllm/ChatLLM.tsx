@@ -19,8 +19,7 @@ import useListFiles from "./hooks/useListFiles";
 type ChatMessage = {
   id: string;
   message: string;
-  role: "user" | "prompt" | "answer";
-  
+  role: "user" | "prompt" | "answer" | "answer-status";
 };
 
 const ChatLLM = () => {
@@ -31,7 +30,7 @@ const ChatLLM = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: listFiles, loadData } = useListFiles();
+  const { data: listFiles, error, loading, loadData } = useListFiles();
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -57,10 +56,10 @@ const ChatLLM = () => {
           console.log("error", error);
           setMessages((prev) => [
             ...prev,
-            { 
-              id: uuidv4(), 
-              message: `Error generating prompt: ${error.message}`, 
-              role: "answer" 
+            {
+              id: uuidv4(),
+              message: `Error generating prompt: ${error.message}`,
+              role: "answer",
             },
           ]);
           return;
@@ -138,10 +137,10 @@ const ChatLLM = () => {
         console.error("Error processing request:", error);
         setMessages((prev) => [
           ...prev,
-          { 
-            id: uuidv4(), 
-            message: `Error: ${error.message}`, 
-            role: "answer" 
+          {
+            id: uuidv4(),
+            message: `Error: ${error.message}`,
+            role: "answer",
           },
         ]);
       }
@@ -159,7 +158,7 @@ const ChatLLM = () => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    
+
     // Show uploading message
     const uploadMsgId = uuidv4();
     setMessages((prev) => [
@@ -170,45 +169,54 @@ const ChatLLM = () => {
         role: "user",
       },
     ]);
-    
+
     try {
       // Create form data for upload
       const formData = new FormData();
-      formData.append('file', file);
-      
+      formData.append("file", file);
+
       // Upload the file to our API endpoint
-      const response = await fetch('/api/rag-pdf-upload-pdf', {
-        method: 'POST',
+      const response = await fetch("/api/rag-pdf-upload-pdf", {
+        method: "POST",
         body: formData,
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to upload file');
+        throw new Error(error.message || "Failed to upload file");
       }
-      
+
       await response.json();
-      
+
       // Update the message to show success
-      setMessages((prev) => 
-        prev.map(msg => 
-          msg.id === uploadMsgId 
-            ? { ...msg, message: `File uploaded successfully: ${file.name}` }
-            : msg
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === uploadMsgId ? { ...msg, message: `${file.name}` } : msg
         )
       );
-      
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          message: `File uploaded successfully: ${file.name}`,
+          role: "answer",
+        },
+      ]);
+
       // Refresh the file list
       loadData();
-      
-    } catch (error:any) {
-      console.error('Error uploading file:', error);
-      
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+
       // Update the message to show error
-      setMessages((prev) => 
-        prev.map(msg => 
-          msg.id === uploadMsgId 
-            ? { ...msg, message: `Error uploading file: ${file.name}. ${error.message}` }
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === uploadMsgId
+            ? {
+                ...msg,
+                message: `Error uploading file: ${file.name}. ${error.message}`,
+              }
             : msg
         )
       );
@@ -229,45 +237,48 @@ const ChatLLM = () => {
   const handleReset = async () => {
     try {
       // Show reset confirmation
-      if (!confirm('Are you sure you want to reset the PDF database? This will remove all uploaded PDFs.')) {
+      if (
+        !confirm(
+          "Are you sure you want to reset the PDF database? This will remove all uploaded PDFs."
+        )
+      ) {
         return;
       }
-      
+
       // Call the reset API endpoint
-      const response = await fetch('/api/rag-pdf-reset', {
-        method: 'POST',
+      const response = await fetch("/api/rag-pdf-reset", {
+        method: "POST",
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to reset PDF database');
+        throw new Error(error.message || "Failed to reset PDF database");
       }
-      
+
       await response.json();
-      
+
       // Add a system message about the reset
       setMessages((prev) => [
         ...prev,
         {
           id: uuidv4(),
-          message: 'PDF database has been reset successfully.',
-          role: 'answer',
+          message: "PDF database has been reset successfully.",
+          role: "answer",
         },
       ]);
-      
+
       // Refresh the file list
       loadData();
-      
     } catch (error: any) {
-      console.error('Error resetting PDF database:', error);
-      
+      console.error("Error resetting PDF database:", error);
+
       // Add error message
       setMessages((prev) => [
         ...prev,
         {
           id: uuidv4(),
           message: `Error resetting PDF database: ${error.message}`,
-          role: 'answer',
+          role: "answer",
         },
       ]);
     }
@@ -333,9 +344,10 @@ const ChatLLM = () => {
             >
               <div
                 className={clsx("p-2 rounded-lg w-fit-content", {
-                  "bg-blue-300 text-blue-900": message.role === "user",
+                  "bg-blue-200 text-blue-900": message.role === "user",
                   "bg-gray-300 text-black": message.role === "prompt",
-                  "bg-purple-300 text-purple-900": message.role === "answer",
+                  "bg-green-200 text-green-900": message.role === "answer-status",
+                  "bg-purple-200 text-purple-900": message.role === "answer",
                 })}
               >
                 <div
@@ -394,15 +406,27 @@ const ChatLLM = () => {
           <div className="text-black">
             <div className="flex items-center justify-between gap-2 pb-2">
               <div>PDFs</div>
-              <button
-                className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
-                onClick={handleReset}
-                title="Reset PDF database"
-              >
-                <TrashIcon className="w-4 h-4" />
-              </button>
+              {listFiles.pdf_details.length > 0 && (
+                <button
+                  className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
+                  onClick={handleReset}
+                  title="Reset PDF database"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                </button>
+              )}
             </div>
             <div className="grid grid-cols-1 gap-2">
+              {loading && (
+                <div className="border border-gray-200 rounded-md p-2 bg-white shadow">
+                  Loading...
+                </div>
+              )}
+              {error && (
+                <div className="text-sm text-red-500 border border-red-200 rounded-md p-2 bg-red-50 shadow">
+                  {error}
+                </div>
+              )}
               {listFiles.pdf_details.map((file) => (
                 <div
                   key={file.file_name}
