@@ -6,10 +6,14 @@ from src.controllers.ask_typhoon import router as ask_typhoon_router
 from src.controllers.ask_typhoon_summary import router as ask_typhoon_summary_router
 from src.controllers.ask_typhoon_stream import router as ask_typhoon_stream_router
 
+
+from src.controllers.rag_pdf_list_pdfs import router as rag_pdf_list_pdfs
+
 from src.controllers.rag_pdf_load import router as rag_pdf_load
 from src.controllers.rag_pdf_search import router as rag_pdf_search
 from src.controllers.rag_pdf_prompt import router as rag_pdf_prompt
 from src.controllers.rag_pdf_ask import router as rag_pdf_ask
+
 
 from src.controllers.rag_website_load import router as rag_website_load
 from src.controllers.rag_website_reset import router as rag_website_reset
@@ -37,6 +41,7 @@ def hello():
 app.include_router(ask_typhoon_router)
 app.include_router(ask_typhoon_summary_router)
 app.include_router(ask_typhoon_stream_router)
+app.include_router(rag_pdf_list_pdfs)
 app.include_router(rag_pdf_load)
 app.include_router(rag_pdf_search)
 app.include_router(rag_pdf_prompt)

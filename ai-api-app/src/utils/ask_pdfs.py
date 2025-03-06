@@ -4,6 +4,9 @@ class AskPDFs:
     def __init__(self):
         self.ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
         
+    def list_pdfs(self, pdf_directory: str):
+        documents = self.ragUtils.loadDocumentsFromPdfFiles(directory=pdf_directory)
+        return documents
 
     def load_pdfs(self, pdf_directory: str):
         # current_dir = os.getcwd()

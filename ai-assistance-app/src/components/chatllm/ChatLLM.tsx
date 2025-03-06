@@ -5,6 +5,7 @@ import {
   Bars3Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  PaperClipIcon,
 } from "@heroicons/react/24/solid";
 import to from "await-to-js";
 import axios from "axios";
@@ -24,6 +25,7 @@ const ChatLLM = () => {
   const [showLeftColumn, setShowLeftColumn] = useState(true);
   const [showRightColumn, setShowRightColumn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -128,6 +130,37 @@ const ChatLLM = () => {
     }
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    // Here you can implement file upload logic
+    // For example, you might want to send the file to a server
+    const file = files[0];
+    console.log('File selected for upload:', file.name);
+    
+    // Add a message to show the file upload
+    setMessages((prev) => [
+      ...prev,
+      { 
+        id: uuidv4(), 
+        message: `Uploading file: ${file.name}`, 
+        role: "user" 
+      },
+    ]);
+    
+    // Reset the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerFileUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -216,6 +249,20 @@ const ChatLLM = () => {
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
             />
+            {/* Hidden file input controlled by the paper clip button */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              className="ml-2 p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400 cursor-pointer"
+              onClick={triggerFileUpload}
+              title="Upload file"
+            >
+              <PaperClipIcon className="w-5 h-5" />
+            </button>
             <button
               className="ml-2 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 cursor-pointer"
               onClick={handleSend}
