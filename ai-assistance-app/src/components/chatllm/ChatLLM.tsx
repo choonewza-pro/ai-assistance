@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
 import React, { useState, useEffect, useRef } from "react";
@@ -6,17 +7,20 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   PaperClipIcon,
+  TrashIcon,
 } from "@heroicons/react/24/solid";
 import to from "await-to-js";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import clsx from "clsx";
 import DOMPurify from "dompurify";
+import useListFiles from "./hooks/useListFiles";
 
 type ChatMessage = {
   id: string;
   message: string;
   role: "user" | "prompt" | "answer";
+  
 };
 
 const ChatLLM = () => {
@@ -26,6 +30,8 @@ const ChatLLM = () => {
   const [showRightColumn, setShowRightColumn] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: listFiles, loadData } = useListFiles();
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -40,86 +46,104 @@ const ChatLLM = () => {
       ]);
       setInput("");
 
-      const question = encodeURIComponent(input);
-      const url = `https://eportfolio.ntplc.co.th/rag-pdf-prompt?question=${question}`;
+      try {
+        const question = encodeURIComponent(input);
+        const url = `/api/rag-pdf-prompt?question=${question}`;
 
-      const [error, resPrompt] = await to(
-        axios.get(url).then((res) => res.data)
-      );
-      if (error) {
-        console.log("error", error);
-        return;
-      }
-
-      console.log("resPrompt", resPrompt);
-
-      const retrievedDocs:RetrievedDocType[] = resPrompt.retrieved_docs;
-
-      const retirevedDocMap: { [key: string]: RetrievedDocType } = {};
-      retrievedDocs.forEach((doc) => {
-        retirevedDocMap[doc.metadata.source] = doc;
-      });
-
-
-      let refDocHtml = "<ul className='list-decimal'>"
-      Object.keys(retirevedDocMap).forEach((key) => {
-        refDocHtml += `<ol>- source: ${getFileName(key)}</ol>`
-      });
-      refDocHtml += "</ul><br/>"
-
-      const cleanPrompt = DOMPurify.sanitize(resPrompt.prompt, {
-        ALLOWED_TAGS: ["p", "br", "strong"],
-        ALLOWED_ATTR: ["class", "style"],
-      });
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: uuidv4(),
-          message: `<h1>PROMPT: </h1><div>${cleanPrompt}</div>`,
-          role: "prompt",
-        },
-      ]);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response: any = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: resPrompt.prompt }),
-      });
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      const answerId = uuidv4();
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: answerId,
-          message: `${refDocHtml}`,
-          role: "answer",
-        },
-      ]);
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        const textChunk = decoder.decode(value);
-
-        setMessages((prev) =>
-          prev.map((msg) => {
-            if (msg.id === answerId) {
-
-              return {
-                ...msg,
-                message: msg.message + textChunk,
-              };
-            }
-            return msg;
-          })
+        const [error, resPrompt] = await to(
+          axios.get(url).then((res) => res.data)
         );
+        if (error) {
+          console.log("error", error);
+          setMessages((prev) => [
+            ...prev,
+            { 
+              id: uuidv4(), 
+              message: `Error generating prompt: ${error.message}`, 
+              role: "answer" 
+            },
+          ]);
+          return;
+        }
+
+        console.log("resPrompt", resPrompt);
+
+        const retrievedDocs: RetrievedDocType[] = resPrompt.retrieved_docs;
+
+        const retirevedDocMap: { [key: string]: RetrievedDocType } = {};
+        retrievedDocs.forEach((doc) => {
+          retirevedDocMap[doc.metadata.source] = doc;
+        });
+
+        let refDocHtml = "<ul className='list-decimal'>";
+        Object.keys(retirevedDocMap).forEach((key) => {
+          refDocHtml += `<ol>- source: ${getFileName(key)}</ol>`;
+        });
+        refDocHtml += "</ul><br/>";
+
+        const cleanPrompt = DOMPurify.sanitize(resPrompt.prompt, {
+          ALLOWED_TAGS: ["p", "br", "strong"],
+          ALLOWED_ATTR: ["class", "style"],
+        });
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: uuidv4(),
+            message: `<h1>PROMPT: </h1><div>${cleanPrompt}</div>`,
+            role: "prompt",
+          },
+        ]);
+
+        // Generate response using the prompt
+        const response: any = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: resPrompt.prompt }),
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        const answerId = uuidv4();
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: answerId,
+            message: `${refDocHtml}`,
+            role: "answer",
+          },
+        ]);
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+
+          const textChunk = decoder.decode(value);
+
+          setMessages((prev) =>
+            prev.map((msg) => {
+              if (msg.id === answerId) {
+                return {
+                  ...msg,
+                  message: msg.message + textChunk,
+                };
+              }
+              return msg;
+            })
+          );
+        }
+      } catch (error: any) {
+        console.error("Error processing request:", error);
+        setMessages((prev) => [
+          ...prev,
+          { 
+            id: uuidv4(), 
+            message: `Error: ${error.message}`, 
+            role: "answer" 
+          },
+        ]);
       }
     }
   };
@@ -130,34 +154,122 @@ const ChatLLM = () => {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
-    // Here you can implement file upload logic
-    // For example, you might want to send the file to a server
+
     const file = files[0];
-    console.log('File selected for upload:', file.name);
     
-    // Add a message to show the file upload
+    // Show uploading message
+    const uploadMsgId = uuidv4();
     setMessages((prev) => [
       ...prev,
-      { 
-        id: uuidv4(), 
-        message: `Uploading file: ${file.name}`, 
-        role: "user" 
+      {
+        id: uploadMsgId,
+        message: `Uploading file: ${file.name}...`,
+        role: "user",
       },
     ]);
     
+    try {
+      // Create form data for upload
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      // Upload the file to our API endpoint
+      const response = await fetch('/api/rag-pdf-upload-pdf', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+      
+      await response.json();
+      
+      // Update the message to show success
+      setMessages((prev) => 
+        prev.map(msg => 
+          msg.id === uploadMsgId 
+            ? { ...msg, message: `File uploaded successfully: ${file.name}` }
+            : msg
+        )
+      );
+      
+      // Refresh the file list
+      loadData();
+      
+    } catch (error:any) {
+      console.error('Error uploading file:', error);
+      
+      // Update the message to show error
+      setMessages((prev) => 
+        prev.map(msg => 
+          msg.id === uploadMsgId 
+            ? { ...msg, message: `Error uploading file: ${file.name}. ${error.message}` }
+            : msg
+        )
+      );
+    }
+
     // Reset the file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
   const triggerFileUpload = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      // Show reset confirmation
+      if (!confirm('Are you sure you want to reset the PDF database? This will remove all uploaded PDFs.')) {
+        return;
+      }
+      
+      // Call the reset API endpoint
+      const response = await fetch('/api/rag-pdf-reset', {
+        method: 'POST',
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to reset PDF database');
+      }
+      
+      await response.json();
+      
+      // Add a system message about the reset
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          message: 'PDF database has been reset successfully.',
+          role: 'answer',
+        },
+      ]);
+      
+      // Refresh the file list
+      loadData();
+      
+    } catch (error: any) {
+      console.error('Error resetting PDF database:', error);
+      
+      // Add error message
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          message: `Error resetting PDF database: ${error.message}`,
+          role: 'answer',
+        },
+      ]);
     }
   };
 
@@ -198,9 +310,6 @@ const ChatLLM = () => {
               อยากอบรมหลักสูตรอะไรถามมาครับ?
             </h1>
           </div>
-
-          
-            
 
           <div>
             {!showRightColumn && (
@@ -282,7 +391,36 @@ const ChatLLM = () => {
               <ChevronRightIcon className="w-6 h-6" />
             </button>
           </div>
-          <div>Right Column Content</div>
+          <div className="text-black">
+            <div className="flex items-center justify-between gap-2 pb-2">
+              <div>PDFs</div>
+              <button
+                className="p-1 bg-red-500 text-white rounded-lg hover:bg-red-400 cursor-pointer"
+                onClick={handleReset}
+                title="Reset PDF database"
+              >
+                <TrashIcon className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-2">
+              {listFiles.pdf_details.map((file) => (
+                <div
+                  key={file.file_name}
+                  className="border border-gray-200 rounded-md p-2 bg-white shadow"
+                >
+                  <div className="text-sm">{file.file_name}</div>
+                  <div className="flex gap-2">
+                    <div className="text-gray-500 text-sm">
+                      {(file.file_size / (1024 * 1024)).toFixed(2)} MB
+                    </div>
+                    <div className="text-gray-500 text-sm">
+                      {file.num_pages} pages
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -292,26 +430,26 @@ const ChatLLM = () => {
 export default ChatLLM;
 
 export type RetrievedDocType = {
-  content:  string;
+  content: string;
   metadata: RetrievedDocMetadataType;
-}
+};
 
 export type RetrievedDocMetadataType = {
-  author:       string;
+  author: string;
   creationdate: Date;
-  creator:      string;
-  keywords:     string;
-  moddate:      Date;
-  page:         number;
-  page_label:   string;
-  producer:     string;
-  source:       string;
-  subject:      string;
-  title:        string;
-  total_pages:  number;
-}
+  creator: string;
+  keywords: string;
+  moddate: Date;
+  page: number;
+  page_label: string;
+  producer: string;
+  source: string;
+  subject: string;
+  title: string;
+  total_pages: number;
+};
 
 const getFileName = (filePath: string): string => {
-  const parts = filePath.split('/');
+  const parts = filePath.split("/");
   return parts[parts.length - 1];
 };

@@ -10,6 +10,20 @@ class AskPDFs:
             "pdf_files": pdf_files,
             "pdf_details": pdf_details,
         }
+    def resetAllDocuments(self):
+        self.ragUtils.resetAllDocuments()
+
+    def import_pdf(self, file_path:str):
+        documents = self.ragUtils.loadDocumentFromPdfFile(file_path=file_path)
+        split_docs = self.ragUtils.splitDocuments(documents=documents, chunk_size=512, chunk_overlap=54)
+        self.ragUtils.ingest(split_docs=split_docs)
+        vector_store_details = {
+            "embedding_model": self.ragUtils.model_name,
+        }
+        return {
+            "vector_store_details": vector_store_details,
+            "chunks_created": len(split_docs),
+        }
 
     def load_pdfs(self, pdf_directory: str):
         # current_dir = os.getcwd()

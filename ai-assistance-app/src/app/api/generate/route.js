@@ -2,7 +2,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GEMINI_API_KEY = "AIzaSyDF7RdGg3HZFryFwZC3jmJTDQsSPBdVo30";
 
-
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 export async function POST(req) {

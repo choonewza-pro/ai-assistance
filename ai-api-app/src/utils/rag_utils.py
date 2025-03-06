@@ -74,8 +74,6 @@ class RagUtils:
         if os.path.exists(os.path.join(self.embeddings_dir, "chroma.sqlite3")):
             print("-- use Append data to vector store--")
             vector_store = Chroma(persist_directory=self.embeddings_dir, embedding_function=embedding)
-            # # ลบ documents ทั้งหมดก่อน
-            # vector_store.reset_collection()  # Ensure the collection is initialized
             # สร้าง collection ใหม่โดยอัตโนมัติเมื่อเพิ่ม documents
             vector_store.add_documents(documents=split_docs)
         else:
@@ -95,8 +93,6 @@ class RagUtils:
             print(f"Vector database at {self.embeddings_dir} deleted successfully.")
         else:
             print(f"Vector database at {self.embeddings_dir} does not exist.")
-
-    
 
     def loadVectorStore(self):
         """
@@ -164,7 +160,7 @@ class RagUtils:
         """
         Get a retriever from the vector store for similarity search.
         """
-        retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+        retriever = vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5})
         return retriever
 
     def genPrompt(self, question: str, retriever: BaseRetriever, role: str = "คุณเป็นผู้ช่วยตอบคำถามแบบสุภาพ"):
@@ -218,6 +214,14 @@ class RagUtils:
             
             pdf_details.append(file_info)
         return pdf_files, pdf_details
+    
+    def loadDocumentFromPdfFile(self, file_path: str):
+        """
+        Load a document from a PDF file.
+        """
+        loader = PyPDFLoader(file_path)
+        docs = loader.load()
+        return docs
     
     def loadDocumentsFromPdfFiles(self, directory:str):
         documents = []
