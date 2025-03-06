@@ -13,6 +13,7 @@ async def rag_pdf_upload_pdf(file: UploadFile = File(...)):
 
     current_dir = os.getcwd()
     pdf_directory = os.path.join(current_dir, "public", "pdf_files")
+    
     os.makedirs(pdf_directory, exist_ok=True)
 
     file_path = os.path.join(pdf_directory, file.filename)

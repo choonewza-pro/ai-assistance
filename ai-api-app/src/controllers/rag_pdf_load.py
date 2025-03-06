@@ -15,6 +15,9 @@ def rag_pdf_load():
     current_dir = os.getcwd()
     pdf_directory = current_dir + "/public/pdf_files"
 
+    if not os.path.exists(pdf_directory):
+        os.makedirs(pdf_directory)
+
     result = askPDFs.load_pdfs(pdf_directory=pdf_directory)
 
     end_time = time.time()
