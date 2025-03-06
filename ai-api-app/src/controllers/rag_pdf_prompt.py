@@ -15,14 +15,14 @@ def rag_pdf_prompt(
     askPDFs = AskPDFs()
     result = askPDFs.genPrompt(question=question);
 
-    prompt_fix = fix_thai_text(result["prompt"])
+    # prompt_fix = fix_thai_text(result["prompt"])
 
     end_time = time.time()
     execution_time = end_time - start_time
 
     response = {
         "execution_time": execution_time,
-        "prompt": prompt_fix,
+        "prompt": result["prompt"],
         "question": question,
         "retrieved_docs": result["retrieved_docs"],
         "vector_store_details": result["vector_store_details"],

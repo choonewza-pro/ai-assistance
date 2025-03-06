@@ -1,5 +1,5 @@
 from src.utils.rag_utils import RagUtils
-# import pdfplumber
+from src.utils.fix_thai_text import fix_thai_text
 class AskPDFs:
     def __init__(self):
         self.ragUtils = RagUtils(embeddings_dir="./chroma-pdfs")
@@ -15,6 +15,9 @@ class AskPDFs:
 
     def import_pdf(self, file_path:str):
         documents = self.ragUtils.loadDocumentFromPdfFile(file_path=file_path)
+
+        for document in documents:
+            document.page_content = fix_thai_text(document.page_content)
 
         # # ใช้ pdfplumber แทนที่ข้อความ
         # with pdfplumber.open(file_path) as pdf:
