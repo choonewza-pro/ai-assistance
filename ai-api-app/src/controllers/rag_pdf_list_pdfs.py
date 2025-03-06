@@ -1,6 +1,7 @@
 import time
 import os
 from fastapi import APIRouter, Query
+from src.utils.ask_pdfs import AskPDFs
 
 router = APIRouter()
 
@@ -14,12 +15,13 @@ def rag_pdf_list_pdfs(
     current_dir = os.getcwd()
     pdf_directory = current_dir + "/public/pdf_files"
 
-    documents = askPDFs.list_pdfs(pdf_directory=pdf_directory)
+    result = askPDFs.list_pdfs(pdf_directory=pdf_directory)
 
     end_time = time.time()
     execution_time = end_time - start_time
 
     return {
         "execution_time": execution_time,
-        "documents": documents,
+        "pdf_files": result["pdf_files"],
+        "pdf_details": result["pdf_details"],
     }
