@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-async-client-component */
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Bars3Icon,
   ChevronLeftIcon,
@@ -8,33 +8,131 @@ import {
 } from "@heroicons/react/24/solid";
 import to from "await-to-js";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
+import clsx from "clsx";
+import DOMPurify from "dompurify";
 
-const ChatLLM =  () => {
-  // const [streaming,setStreaming] = useState(false);
-  const [messages, setMessages] = useState<string[]>([]);
+type ChatMessage = {
+  id: string;
+  message: string;
+  role: "user" | "prompt" | "answer";
+};
+
+const ChatLLM = () => {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState<string>("");
   const [showLeftColumn, setShowLeftColumn] = useState(true);
   const [showRightColumn, setShowRightColumn] = useState(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const handleSend = async () => {
     if (input.trim()) {
-      setMessages([...messages, input]);
+      const cleanInput = DOMPurify.sanitize(input, {
+        ALLOWED_TAGS: ["p", "br", "strong"],
+        ALLOWED_ATTR: ["class", "style"],
+      });
+
+      setMessages((prev) => [
+        ...prev,
+        { id: uuidv4(), message: cleanInput, role: "user" },
+      ]);
       setInput("");
 
       const question = encodeURIComponent(input);
       const url = `https://eportfolio.ntplc.co.th/rag-pdf-prompt?question=${question}`;
-      const [error,resPrompt] = await to(
+
+      const [error, resPrompt] = await to(
         axios.get(url).then((res) => res.data)
-      )
-      if(error){
-        console.log("error",error)
-        return
+      );
+      if (error) {
+        console.log("error", error);
+        return;
       }
-      
-      console.log("XXX",resPrompt)
-      // Here you would add the logic to send the message to Ollama LLM and get the response
+
+      console.log("resPrompt", resPrompt);
+
+      const retrievedDocs:RetrievedDocType[] = resPrompt.retrieved_docs;
+
+      const retirevedDocMap: { [key: string]: RetrievedDocType } = {};
+      retrievedDocs.forEach((doc) => {
+        retirevedDocMap[doc.metadata.source] = doc;
+      });
+
+
+      let refDocHtml = "<ul className='list-decimal'>"
+      Object.keys(retirevedDocMap).forEach((key) => {
+        refDocHtml += `<ol>- source: ${getFileName(key)}</ol>`
+      });
+      refDocHtml += "</ul><br/>"
+
+      const cleanPrompt = DOMPurify.sanitize(resPrompt.prompt, {
+        ALLOWED_TAGS: ["p", "br", "strong"],
+        ALLOWED_ATTR: ["class", "style"],
+      });
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uuidv4(),
+          message: `<h1>PROMPT: </h1><div>${cleanPrompt}</div>`,
+          role: "prompt",
+        },
+      ]);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response: any = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: resPrompt.prompt }),
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      const answerId = uuidv4();
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: answerId,
+          message: `${refDocHtml}`,
+          role: "answer",
+        },
+      ]);
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const textChunk = decoder.decode(value);
+
+        setMessages((prev) =>
+          prev.map((msg) => {
+            if (msg.id === answerId) {
+
+              return {
+                ...msg,
+                message: msg.message + textChunk,
+              };
+            }
+            return msg;
+          })
+        );
+      }
     }
   };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSend();
+    }
+  };
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -63,8 +161,13 @@ const ChatLLM =  () => {
           </div>
 
           <div>
-            <h1 className="text-xl font-bold text-blue-500">อยากอบรมหลักสูตรอะไรถามมาครับ</h1>
+            <h1 className="text-xl font-bold text-blue-500">
+              อยากอบรมหลักสูตรอะไรถามมาครับ?
+            </h1>
           </div>
+
+          
+            
 
           <div>
             {!showRightColumn && (
@@ -78,13 +181,30 @@ const ChatLLM =  () => {
           </div>
         </div>
         <div className="flex-grow p-4 overflow-y-auto">
-          {messages.map((message, index) => (
-            <div key={index} className="mb-4">
-              <div className="bg-blue-500 text-white p-2 rounded-lg">
-                {message}
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={clsx("mb-4", {
+                "flex justify-end": message.role === "user",
+                "flex justify-start": message.role !== "user",
+              })}
+            >
+              <div
+                className={clsx("p-2 rounded-lg w-fit-content", {
+                  "bg-blue-300 text-blue-900": message.role === "user",
+                  "bg-gray-300 text-black": message.role === "prompt",
+                  "bg-purple-300 text-purple-900": message.role === "answer",
+                })}
+              >
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: message.message.replace(/\n/g, "<br>"),
+                  }}
+                />
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         <div className="p-4 bg-white border-t border-gray-300">
           <div className="flex">
@@ -93,6 +213,7 @@ const ChatLLM =  () => {
               className="flex-grow p-2 border border-gray-300 rounded-lg text-black"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Type your message..."
             />
             <button
@@ -122,3 +243,28 @@ const ChatLLM =  () => {
 };
 
 export default ChatLLM;
+
+export type RetrievedDocType = {
+  content:  string;
+  metadata: RetrievedDocMetadataType;
+}
+
+export type RetrievedDocMetadataType = {
+  author:       string;
+  creationdate: Date;
+  creator:      string;
+  keywords:     string;
+  moddate:      Date;
+  page:         number;
+  page_label:   string;
+  producer:     string;
+  source:       string;
+  subject:      string;
+  title:        string;
+  total_pages:  number;
+}
+
+const getFileName = (filePath: string): string => {
+  const parts = filePath.split('/');
+  return parts[parts.length - 1];
+};
