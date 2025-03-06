@@ -432,7 +432,7 @@ const ChatLLM = () => {
                 </div>
               )}
               {listFiles.pdf_details.map((file) => (
-                <a href={`${appConfig.apiBaseUrl}/static/pdf_files/${file.file_name}`} target="_blank" key={file.file_name}>
+                <a href={`${appConfig.apiRealUrl}/static/pdf_files/${file.file_name}`} target="_blank" key={file.file_name}>
                   <div
                     key={file.file_name}
                     className="border border-gray-200 rounded-md p-2 bg-white shadow"
