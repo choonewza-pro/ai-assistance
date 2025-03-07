@@ -2,6 +2,7 @@ import time
 import os
 from fastapi import APIRouter, Query
 from src.utils.ask_websites import AskWebs
+from src.utils.fix_thai_text import fix_thai_text
 
 router = APIRouter()
 
@@ -13,13 +14,15 @@ def rag_website_prompt(
 
     askWebs = AskWebs()
     result = askWebs.genPrompt(question=question);
+
+    prompt_fix = fix_thai_text(result["prompt"])
     
     end_time = time.time()
     execution_time = end_time - start_time
 
     return {
         "execution_time": execution_time,
-        "prompt": result["prompt"],
+        "prompt": prompt_fix,
         "question": question,
         "retrieved_docs": result["retrieved_docs"],
         "vector_store_details": result["vector_store_details"],
