@@ -2,6 +2,9 @@
 - docker compose up -d
 
 # 2. Start LLM Model
+- docker compose exec ollama ollama pull scb10x/llama3.2-typhoon2-3b-instruct
+- docker compose exec -d ollama ollama run scb10x/llama3.2-typhoon2-3b-instruct
+
 - docker compose exec ollama ollama pull deepseek-r1:1.5b
 - docker compose exec ollama ollama pull bge-m3:latest
 - docker compose exec -d ollama ollama run deepseek-r1:1.5b
