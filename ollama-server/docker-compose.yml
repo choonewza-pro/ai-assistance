@@ -41,6 +41,48 @@ services:
       - n8n-data:/home/node/.n8n
     networks:
       - ai-network
+  
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch
+    environment:
+      - discovery.type=single-node  # Run as a single-node cluster
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"  # Set JVM heap size
+      - DISABLE_SECURITY_PLUGIN=true  # Disable security for simplicity (not recommended for production)
+      - network.host=0.0.0.0  # เปิดให้รับจากทุก IP
+      # - plugins.security.disabled=false  # เปิด Security Plugin
+      # - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin1234  # รหัสผ่านเริ่มต้นสำหรับ admin (ตั้งค่า 2.12+)
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data  # Persist data
+    ports:
+      - 9200:9200  # REST API
+      - 9600:9600  # Performance Analyzer
+    networks:
+      - ai-network
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601  # Dashboards UI
+    expose:
+      - "5601"
+    restart: unless-stopped
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]  # Connect to OpenSearch
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true  # Disable security (not for production)
+    depends_on:
+      - opensearch
+    networks:
+      - ai-network
 
 networks:
   ai-network:
@@ -51,3 +93,4 @@ networks:
 volumes:
   open-webui-data:
   n8n-data:
+  opensearch-data:
