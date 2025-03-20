@@ -22,6 +22,8 @@ from src.controllers.rag_website_search import router as rag_website_search
 from src.controllers.rag_website_prompt import router as rag_website_prompt
 from src.controllers.rag_website_ask import router as rag_website_ask
 
+from src.controllers.test import router as test_router
+
 app = FastAPI()
 
 # Add CORS middleware
@@ -54,3 +56,5 @@ app.include_router(rag_website_search)
 app.include_router(rag_website_prompt)
 app.include_router(rag_website_ask)
 app.include_router(rag_pdf_reset)
+
+app.include_router(test_router)

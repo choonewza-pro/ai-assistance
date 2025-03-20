@@ -1,3 +1,4 @@
+accelerate==1.5.2
 aext_assistant @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_6c8uur14cp/croot/aext-assistant_1698112918207/work
 aext_assistant_server @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_3fa4r08rn4/croot/aext-assistant-server_1698104615161/work/backend_lib/assistant
 aext_core @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_06c0hdx3vp/croot/aext-core_1698107559667/work
@@ -177,7 +178,7 @@ intervaltree @ file:///Users/ktietz/demo/mc3/conda-bld/intervaltree_163051188966
 ipykernel @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_02wd6dgggf/croot/ipykernel_1705933834674/work
 ipython @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_32zk9b7snp/croot/ipython_1704833017294/work
 ipython-genutils @ file:///tmp/build/80754af9/ipython_genutils_1606773439826/work
-ipywidgets==8.1.2
+ipywidgets==8.1.5
 isort @ file:///tmp/build/80754af9/isort_1628603791788/work
 itemadapter @ file:///tmp/build/80754af9/itemadapter_1626442940632/work
 itemloaders @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_e1nzju_zur/croot/itemloaders_1708642351186/work
@@ -207,16 +208,17 @@ jupyter_server_ydoc @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq0000
 jupyterlab @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_68lg3corvq/croot/jupyterlab_1708029891621/work
 jupyterlab-pygments @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_386dgp8nj1/croot/jupyterlab_pygments_1700168599627/work
 jupyterlab_server @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_57gd4vwlz2/croot/jupyterlab_server_1699555433477/work
-jupyterlab_widgets==3.0.10
+jupyterlab_widgets==3.0.13
 keyring @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_2ds0bchnl2/croot/keyring_1678999223818/work
 kiwisolver @ file:///Users/ec2-user/ci_py311/kiwisolver_1678322457192/work
 kubernetes==32.0.1
-langchain==0.3.19
+langchain==0.3.21
 langchain-chroma==0.2.2
-langchain-community==0.3.18
-langchain-core==0.3.37
+langchain-community==0.3.20
+langchain-core==0.3.46
+langchain-huggingface==0.1.2
 langchain-ollama==0.2.3
-langchain-text-splitters==0.3.6
+langchain-text-splitters==0.3.7
 langsmith==0.3.10
 lazy-object-proxy @ file:///Users/ec2-user/ci_py311/lazy-object-proxy_1678322504286/work
 lazy_loader @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_4a85lv11ob/croot/lazy_loader_1695850116141/work
@@ -292,6 +294,8 @@ partd @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_3599
 pathlib @ file:///Users/ktietz/demo/mc3/conda-bld/pathlib_1629713961906/work
 pathspec @ file:///Users/ec2-user/ci_py311_2/pathspec_1679337122817/work
 patsy==0.5.3
+pdfminer.six==20231228
+pdfplumber==0.11.5
 pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 pillow @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_f8zh99mhe_/croot/pillow_1707233029679/work
@@ -306,7 +310,7 @@ prometheus-client @ file:///Users/ec2-user/ci_py311_2/prometheus_client_16793402
 prompt-toolkit @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_4d8kk9w3ed/croot/prompt-toolkit_1704404354789/work
 Protego @ file:///tmp/build/80754af9/protego_1598657180827/work
 proto-plus==1.23.0
-protobuf==3.20.3
+protobuf==5.29.4
 psutil @ file:///Users/ec2-user/ci_py311_2/psutil_1679337242143/work
 ptyprocess @ file:///tmp/build/80754af9/ptyprocess_1609355006118/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl
 pure-eval @ file:///opt/conda/conda-bld/pure_eval_1646925070566/work
@@ -335,7 +339,7 @@ PyJWT @ file:///Users/ec2-user/ci_py311/pyjwt_1678379090382/work
 pylint @ file:///Users/ec2-user/ci_py311/pylint_1678379112162/work
 pylint-venv @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_3dahm2v5f3/croot/pylint-venv_1709837629826/work
 pyls-spyder==0.4.0
-PyMuPDF==1.25.3
+PyMuPDF==1.25.4
 pyobjc-core @ file:///Users/ec2-user/ci_py311/pyobjc-core_1678375734970/work
 pyobjc-framework-Cocoa @ file:///Users/ec2-user/ci_py311/pyobjc-framework-cocoa_1678375905004/work
 pyobjc-framework-CoreServices @ file:///Users/ec2-user/ci_py311/pyobjc-framework-coreservices_1678383123980/work
@@ -343,7 +347,8 @@ pyobjc-framework-FSEvents @ file:///Users/ec2-user/ci_py311/pyobjc-framework-fse
 pyodbc @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_0c35321swi/croot/pyodbc_1705431357684/work
 pyOpenSSL @ file:///private/var/folders/c_/qfmhj66j0tn016nkx_th4hxm0000gp/T/abs_943yktheie/croot/pyopenssl_1708380423436/work
 pyparsing @ file:///Users/ec2-user/ci_py311/pyparsing_1678322828710/work
-pypdf==5.3.0
+pypdf==5.4.0
+pypdfium2==4.30.1
 PyPika==0.48.9
 pyproj==3.6.1
 pyproject_hooks==1.2.0
@@ -397,6 +402,7 @@ Scrapy @ file:///Users/ec2-user/ci_py311/scrapy_1678422467931/work
 seaborn @ file:///Users/ec2-user/ci_py311/seaborn_1678394152964/work
 semver @ file:///tmp/build/80754af9/semver_1603822362442/work
 Send2Trash @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_6c5du7dh0i/croot/send2trash_1699371145992/work
+sentence-transformers==3.4.1
 service-identity @ file:///Users/ktietz/demo/mc3/conda-bld/service_identity_1629460757137/work
 shapely==2.0.4
 shellingham==1.5.4
@@ -441,6 +447,7 @@ toml @ file:///tmp/build/80754af9/toml_1616166611790/work
 tomli @ file:///Users/ec2-user/ci_py311/tomli_1678315243316/work
 tomlkit @ file:///Users/ec2-user/ci_py311/tomlkit_1678317388739/work
 toolz @ file:///Users/ec2-user/ci_py311/toolz_1678323009669/work
+torch==2.2.2
 tornado @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_65x80foild/croot/tornado_1696936984963/work
 tqdm @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_03acd6t6ca/croot/tqdm_1679561866522/work
 traitlets @ file:///Users/ec2-user/ci_py311/traitlets_1678316097905/work
@@ -468,7 +475,7 @@ websocket-client @ file:///Users/ec2-user/ci_py311/websocket-client_167831775850
 websockets==15.0
 Werkzeug @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_fegt3z60s3/croot/werkzeug_1679489762631/work
 whatthepatch @ file:///Users/ec2-user/ci_py311/whatthepatch_1678379478749/work
-widgetsnbextension==4.0.10
+widgetsnbextension==4.0.13
 wrapt @ file:///Users/ec2-user/ci_py311/wrapt_1678323111850/work
 wurlitzer @ file:///Users/ec2-user/ci_py311/wurlitzer_1678390004531/work
 xarray @ file:///private/var/folders/sy/f16zz6x50xz3113nwtb9bvq00000gp/T/abs_ba3w2rvoxd/croot/xarray_1689041477488/work
