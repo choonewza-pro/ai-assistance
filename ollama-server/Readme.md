@@ -2,8 +2,14 @@
 - docker compose up -d
 
 # 2. Start LLM Model
+
+- docker compose exec ollama ollama pull scb10x/llama3.2-typhoon2-1b-instruct
+
 - docker compose exec ollama ollama pull scb10x/llama3.2-typhoon2-3b-instruct
 - docker compose exec -d ollama ollama run scb10x/llama3.2-typhoon2-3b-instruct
+
+- docker compose exec ollama ollama pull promptnow/openthaigpt1.5-7b-instruct-q4_k_m
+- docker compose exec -d ollama ollama run promptnow/openthaigpt1.5-7b-instruct-q4_k_m
 
 - docker compose exec ollama ollama pull scb10x/llama3.2-typhoon2-t1-3b-research-preview
 - docker compose exec -d ollama ollama run scb10x/llama3.2-typhoon2-t1-3b-research-preview
